@@ -1,5 +1,7 @@
 # Folder Sort Unified
 
+[![Run Tests](https://github.com/enprocode/folder-sort-auto/actions/workflows/test.yml/badge.svg)](https://github.com/enprocode/folder-sort-auto/actions/workflows/test.yml)
+
 クロスプラットフォーム対応（macOS / Windows）のフォルダ整理ツールです。  
 指定したフォルダ内のファイルを、**日付単位**または**拡張子単位**で自動整理します。
 
