@@ -32,7 +32,7 @@
 Python 3.9 以上を推奨します。
 
 ```bash
-git clone https://github.com/あなたのリポジトリ/folder-sort-auto.git
+git clone https://github.com/enprocode/folder-sort-auto.git
 cd folder-sort-auto
 ```
 
