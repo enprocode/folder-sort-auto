@@ -69,9 +69,6 @@ def safe_move(src_path: Path, dst_path: Path, dry_run: bool = False) -> Tuple[bo
     Returns (success, target_path).
     In dry-run mode, only prints the planned move.
     """
-    dst_parent = dst_path.parent
-    dst_parent.mkdir(parents=True, exist_ok=True)
-
     base, suf = dst_path.stem, dst_path.suffix
     candidate = dst_path
     i = 1
@@ -82,6 +79,8 @@ def safe_move(src_path: Path, dst_path: Path, dry_run: bool = False) -> Tuple[bo
     if dry_run:
         print(f"[DRY-RUN] {src_path} → {candidate}")
         return True, candidate
+
+    candidate.parent.mkdir(parents=True, exist_ok=True)
 
     try:
         shutil.move(str(src_path), str(candidate))
@@ -153,8 +152,10 @@ def main(argv=None) -> int:
     parser.add_argument("--src", type=Path, default=default_src, help=f"整理元フォルダ（デフォルト: {default_src}）")
     parser.add_argument("--dst", type=Path, default=default_dst, help=f"整理先フォルダ（デフォルト: {default_dst}）")
     parser.add_argument("--ext-mode", choices=["last", "all"], default="all", help="拡張子モード: last=最終のみ, all=複合拡張子全体")
-    parser.add_argument("--dry-run", action="store_true", default=True, help="実際に移動せず予定のみ表示（デフォルト有効）")
-    parser.add_argument("--force", action="store_true", help="dry-runを無効化して実際に移動する")
+    parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="実際に移動せず予定のみ表示（デフォルト有効）")
+    parser.add_argument("--no-dry-run", dest="dry_run", action="store_false", help="dry-runを無効化して実際に移動する")
+    parser.set_defaults(dry_run=True)
+    parser.add_argument("--force", action="store_true", help="安全確認をスキップして実際に移動する（--no-dry-runと併用可）")
 
     args = parser.parse_args(argv)
 
@@ -174,7 +175,9 @@ def main(argv=None) -> int:
         if not args.force:
             return 1
 
-    dry_run = not args.force
+    dry_run = args.dry_run
+    if args.force:
+        dry_run = False
     date_str = datetime.now().strftime("%Y-%m-%d")
 
     if args.mode == "date":

@@ -97,6 +97,19 @@ def test_safe_move_collision(temp_dirs):
     assert candidate.exists()
 
 
+def test_safe_move_dry_run_does_not_create_dirs(temp_dirs):
+    """dry-run時に移動先ディレクトリを作成しないか"""
+    src, dst = temp_dirs
+    f = create_file(src, "dry_run.txt")
+    target_dir = dst / "subdir"
+
+    ok, candidate = sorter.safe_move(f, target_dir / "dry_run.txt", dry_run=True)
+    assert ok
+    assert candidate == target_dir / "dry_run.txt"
+    assert not target_dir.exists()
+    assert f.exists()
+
+
 def test_is_hidden_or_temp(tmp_path, mocker):
     """隠しファイル・Windows属性ファイルを検知できるか"""
     hidden_file = tmp_path / ".hidden"
@@ -138,3 +151,27 @@ def test_error_handling(monkeypatch, temp_dirs):
     monkeypatch.setattr("shutil.move", raise_error)
     ok, _ = sorter.safe_move(f, dst / "x.txt", dry_run=False)
     assert not ok
+
+
+@freeze_time("2025-10-14")
+def test_main_dry_run_default(temp_dirs):
+    """デフォルト動作(dry-run)でディレクトリが作成されないか"""
+    src, dst = temp_dirs
+    f = create_file(src, "stay.txt")
+
+    rc = sorter.main(["--src", str(src), "--dst", str(dst)])
+    assert rc == 0
+    assert f.exists()
+    assert not (dst / "2025-10-14").exists()
+
+
+@freeze_time("2025-10-14")
+def test_main_no_dry_run_moves_files(temp_dirs):
+    """--no-dry-run指定で実際に移動されるか"""
+    src, dst = temp_dirs
+    f = create_file(src, "move.txt")
+
+    rc = sorter.main(["--src", str(src), "--dst", str(dst), "--no-dry-run"])
+    assert rc == 0
+    assert not f.exists()
+    assert (dst / "2025-10-14" / "move.txt").exists()
