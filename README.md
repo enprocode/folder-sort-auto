@@ -13,8 +13,10 @@
   → ファイルの拡張子ごとに整理（`.tar.gz` のような複合拡張子にも対応）
 - ✅ **dry-run（デフォルト）**  
   → 実際にファイルを移動せず、予定動作のみを一覧表示
-- ✅ **--force 指定で実行**  
-  → ファイルを実際に移動
+- ✅ **--no-dry-run で実行**  
+  → dry-run を無効化してファイルを実際に移動
+- ✅ **--force で安全確認スキップ**  
+  → `--no-dry-run` と併用することで警告を無視して強制実行
 - ✅ **重複ファイル対応**  
   → `(1)`, `(2)` のように自動でリネームして安全に移動
 - ✅ **Windows隠し属性にも対応**  
@@ -56,7 +58,9 @@ python src/folder_sort_unified.py --mode date
 実際に移動する場合：
 
 ```bash
-python src/folder_sort_unified.py --mode date --force
+python src/folder_sort_unified.py --mode date --no-dry-run
+# 警告を無視して強制実行する場合は --force も指定
+# python src/folder_sort_unified.py --mode date --no-dry-run --force
 ```
 
 ---
@@ -85,7 +89,8 @@ python src/folder_sort_unified.py --mode ext
 | `--dst <path>` | 整理先フォルダ | `~/Documents/Sorted` |
 | `--ext-mode {last, all}` | 拡張子モード: `last`（最終拡張子のみ）, `all`（複合拡張子） | `all` |
 | `--dry-run` | 実際に移動せず予定のみ表示 | 有効（デフォルト） |
-| `--force` | dry-runを無効化して実際に移動 | 無効（指定時のみ有効） |
+| `--no-dry-run` | dry-runを無効化して実際に移動 | 無効 |
+| `--force` | 警告（同一フォルダ/配下チェックなど）を無視して実行 | 無効 |
 
 ---
 
@@ -103,7 +108,7 @@ python src/folder_sort_unified.py --mode ext
 
 | 機能 | 内容 |
 |------|------|
-| 安全性 | dry-runデフォルト + --force明示で実行 |
+| 安全性 | dry-runデフォルト + --no-dry-run明示で実行 |
 | 日付モード | main() で決定した日付文字列を一貫使用 |
 | 拡張子モード | `.tar.gz → TAR.GZ`（--ext-mode=all） |
 | ファイル重複 | 自動リネーム `(1)`, `(2)` |
@@ -145,10 +150,7 @@ pytest --cov=src
 MIT License  
 Copyright (c) 2025
 
-```
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files...
-```
+[LICENSE](LICENSE)
 
 ---
 
